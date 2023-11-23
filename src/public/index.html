@@ -1,42 +1,38 @@
 <!DOCTYPE html>
 <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
+
 <body>
   <h1>SimpleWebAuthn Example</h1>
   <label for="username">Username:</label><br>
   <input type="text" id="username"><br>
-  <button type="submit" id="btnBegin">Submit</button>
+  <button type="submit" id="register" onclick="register()">Register</button>
   <p id="success"></p>
   <p id="error"></p>
 </body>
 <script>
-  const { startRegistration } = SimpleWebAuthnBrowser;
+  async function register() {
+    const { startRegistration } = SimpleWebAuthnBrowser;
 
-  const elemBegin = document.getElementById('btnBegin');
-  const elemSuccess = document.getElementById('success');
-  const elemError = document.getElementById('error');
-  const username = document.getElementById('username');;
-
-  elemBegin.addEventListener('click', async () => {
+    const elemBegin = document.getElementById('register');
+    const elemSuccess = document.getElementById('success');
+    const elemError = document.getElementById('error');
+    const username = document.getElementById('username');;
     elemSuccess.innerHTML = '';
     elemError.innerHTML = '';
-    
-    const resp = await fetch('/attestation/options',{
+    const resp = await fetch('/attestation/options', {
       method: 'POST',
-      credentials : 'same-origin',
-      headers : {
-            'Content-Type' : 'application/json'
-        },
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         username: username.value
       })
     });
-
     let attResp;
     try {
-      // Pass the options to the authenticator and wait for a response
       attResp = await startRegistration(await resp.json());
     } catch (error) {
-      // Some basic error handling
       if (error.name === 'InvalidStateError') {
         elemError.innerText = 'Error: Authenticator was probably already registered by user';
       } else {
@@ -44,8 +40,6 @@
       }
       throw error;
     }
-    console.log(attResp);
-
     const verificationResp = await fetch('/attestation/result', {
       method: 'POST',
       headers: {
@@ -61,8 +55,8 @@
     } else {
       elemError.innerText = 'Error: ' + verificationJSON.errorMessage;
     }
-  });
-
+  }
 
 </script>
+
 </html>
