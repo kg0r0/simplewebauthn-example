@@ -11,6 +11,7 @@ const app: express.Express = express()
 
 declare module 'express-session' {
   interface SessionData {
+    username?: string;
     currentChallenge?: string;
   }
 }

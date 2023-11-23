@@ -45,6 +45,22 @@
       throw error;
     }
     console.log(attResp);
+
+    const verificationResp = await fetch('/attestation/result', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(attResp),
+    });
+    const verificationJSON = await verificationResp.json();
+    console.log(verificationJSON);
+
+    if (verificationJSON && verificationJSON.status === 'ok') {
+      elemSuccess.innerText = 'Successfully registered!';
+    } else {
+      elemError.innerText = 'Error: ' + verificationJSON.errorMessage;
+    }
   });
 
 

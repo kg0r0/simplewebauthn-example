@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response} from 'express';
 import {
   generateAuthenticationOptions,
   verifyAuthenticationResponse,
@@ -6,10 +6,20 @@ import {
 
 const router = express.Router();
 
-router.post('/options', async (req: Express.Request, res: Express.Response) => {
+router.post('/options', async (req: Request, res: Response) => {
+  const result = {
+    status: 'ok',
+    errorMessage: '',
+  }
+  res.json(result)
 });
 
-router.post('/result', async (req: Express.Request, res: Express.Response) => {
+router.post('/result', async (req: Request, res: Response) => {
+  const result = {
+    status: 'ok',
+    errorMessage: '',
+  }
+  res.json(result)
 });
 
 export default router;
