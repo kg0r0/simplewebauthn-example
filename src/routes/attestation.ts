@@ -4,11 +4,11 @@ import {
   generateRegistrationOptions,
   verifyRegistrationResponse
 } from '@simplewebauthn/server';
+import { AuthenticatorDevice, RegistrationResponseJSON } from '@simplewebauthn/typescript-types';
+import { isoUint8Array } from '@simplewebauthn/server/helpers';
 import crypto from 'crypto';
 import config from './config';
 import database from './db';
-import { AuthenticatorDevice, RegistrationResponseJSON } from '@simplewebauthn/typescript-types';
-import { isoUint8Array } from '@simplewebauthn/server/helpers';
 
 const router = express.Router();
 
@@ -25,7 +25,7 @@ router.post('/options', async (req: Request, res: Response) => {
     }
   }
   const user = database[req.body.username];
-  const optionsForCredentialCreation = await generateRegistrationOptions({
+  const credentialCreationOptions = await generateRegistrationOptions({
     rpName,
     rpID,
     userID: user.id,
@@ -46,7 +46,7 @@ router.post('/options', async (req: Request, res: Response) => {
     status: 'ok',
     errorMessage: '',
   }
-  const options = Object.assign(successRes, optionsForCredentialCreation)
+  const options = Object.assign(successRes, credentialCreationOptions);
   req.session.username = user.username;
   req.session.currentChallenge = options.challenge;
   res.json(options)

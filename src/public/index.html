@@ -6,6 +6,7 @@
   <label for="username">Username:</label><br>
   <input type="text" id="username"><br>
   <button type="submit" id="register" onclick="register()">Register</button>
+  <button type="submit" id="authenticate" onclick="authenticate()">Authenticate</button>
   <p id="success"></p>
   <p id="error"></p>
 </body>
@@ -57,6 +58,26 @@
     }
   }
 
+  async function authenticate() {
+    const { startAuthentication } = SimpleWebAuthnBrowser;
+    const elemBegin = document.getElementById('authenticate');
+    const elemSuccess = document.getElementById('success');
+    const elemError = document.getElementById('error');
+    const username = document.getElementById('username');;
+    elemSuccess.innerHTML = '';
+    elemError.innerHTML = '';
+    const resp = await fetch('/assertion/options', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: username.value
+      })
+    });
+    console.log(resp);
+  }
 </script>
 
 </html>
