@@ -34,7 +34,7 @@ router.post('/options', async (req: Request, res: Response) => {
       type: 'public-key',
       transports: authenticator.transports,
     })),
-    userVerification: 'required',
+    userVerification: 'discouraged',
     rpID
   }
   const credentialGetOptions = await generateAuthenticationOptions(opts);
@@ -78,7 +78,7 @@ router.post('/result', async (req: Request, res: Response) => {
       expectedOrigin: origin,
       expectedRPID: rpID,
       authenticator: dbAuthenticator,
-      requireUserVerification: true
+      requireUserVerification: false
     };
     verification = await verifyAuthenticationResponse(opts);
   } catch (error: any) {

@@ -37,8 +37,8 @@ router.post('/options', async (req: Request, res: Response) => {
       transports: authenticator.transports,
     })),
     authenticatorSelection: {
-      residentKey: 'preferred',
-      userVerification: 'preferred',
+      residentKey: 'discouraged',
+      userVerification: 'discouraged',
       authenticatorAttachment: 'cross-platform',
     },
   });
@@ -61,7 +61,7 @@ router.post('/result', async (req: Request, res: Response) => {
     expectedChallenge: `${expectedChallenge}`,
     expectedOrigin: origin,
     expectedRPID: rpID,
-    requireUserVerification: true,
+    requireUserVerification: false,
   };
   const verification = await verifyRegistrationResponse(opts);
   const { verified, registrationInfo } = verification;
