@@ -76,7 +76,26 @@
         username: username.value
       })
     });
-    console.log(resp);
+    let asseResp;
+    try {
+      asseResp = await startAuthentication(await resp.json());
+    } catch (error) {
+      elemError.innerText = error;
+    }
+    const verificationResp = await fetch('/assertion/result', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(asseResp),
+    });
+    const verificationJSON = await verificationResp.json();
+
+    if (verificationJSON && verificationJSON.status === 'ok') {
+      elemSuccess.innerText = 'Successfully authenticated!';
+    } else {
+      elemError.innerText = 'Error: ' + verificationJSON.errorMessage;
+    }
   }
 </script>
 
