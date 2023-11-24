@@ -39,7 +39,7 @@ router.post('/options', async (req: Request, res: Response) => {
     authenticatorSelection: {
       residentKey: 'preferred',
       userVerification: 'preferred',
-      authenticatorAttachment: 'platform',
+      authenticatorAttachment: 'cross-platform',
     },
   });
   const successRes = {

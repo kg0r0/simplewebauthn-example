@@ -96,6 +96,7 @@ router.post('/result', async (req: Request, res: Response) => {
   }
   dbAuthenticator.counter = authenticationInfo.newCounter;
   req.session.currentChallenge = undefined;
+  req.session.isLoggedIn = true;
   const result = {
     status: 'ok',
     errorMessage: '',

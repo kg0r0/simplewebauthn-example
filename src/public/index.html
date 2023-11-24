@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
 
-<body>
+<body onload="isLoggedIn()">
   <h1>SimpleWebAuthn Example</h1>
   <label for="username">Username:</label><br>
   <input type="text" id="username"><br>
@@ -9,8 +9,17 @@
   <button type="submit" id="authenticate" onclick="authenticate()">Authenticate</button>
   <p id="success"></p>
   <p id="error"></p>
+  <p id="loginname"></p>
 </body>
 <script>
+  async function isLoggedIn() {
+    const resp = await fetch('/isLoggedIn');
+    const json = await resp.json();
+    if (json.status === 'ok') {
+      document.getElementById('loginname').innerText = 'Logged in as: ' + json.username;
+    }
+  }
+
   async function register() {
     const { startRegistration } = SimpleWebAuthnBrowser;
 
@@ -49,7 +58,6 @@
       body: JSON.stringify(attResp),
     });
     const verificationJSON = await verificationResp.json();
-    console.log(verificationJSON);
 
     if (verificationJSON && verificationJSON.status === 'ok') {
       elemSuccess.innerText = 'Successfully registered!';
@@ -93,6 +101,7 @@
 
     if (verificationJSON && verificationJSON.status === 'ok') {
       elemSuccess.innerText = 'Successfully authenticated!';
+      await isLoggedIn();
     } else {
       elemError.innerText = 'Error: ' + verificationJSON.errorMessage;
     }
