@@ -64,7 +64,7 @@ router.post('/result', async (req: Request, res: Response) => {
   }
 
   if (!dbAuthenticator) {
-    return res.status(400).send({
+    return res.json({
       status: 'failed',
       errorMessage: 'Authenticator is not registered with this site.',
     });
@@ -81,15 +81,15 @@ router.post('/result', async (req: Request, res: Response) => {
       requireUserVerification: false
     };
     verification = await verifyAuthenticationResponse(opts);
-  } catch (error: any) {
-    return res.status(400).send({
+  } catch (error) {
+    return res.json({
       status: 'failed',
-      errorMessage: error.message,
+      errorMessage: (error as Error).message,
     });
   }
   const { verified, authenticationInfo } = verification;
   if (!verified || !authenticationInfo) {
-    return res.status(400).send({
+    return res.json({
       status: 'failed',
       errorMessage: 'Can not authenticate signature.',
     });

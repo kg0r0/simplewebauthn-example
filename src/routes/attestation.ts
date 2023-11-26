@@ -30,7 +30,7 @@ router.post('/options', async (req: Request, res: Response) => {
     rpID,
     userID: user.id,
     userName: user.username,
-    attestationType: 'none',
+    attestationType: 'direct',
     excludeCredentials: user.authenticators.map(authenticator => ({
       id: authenticator.credentialID,
       type: 'public-key',
@@ -63,7 +63,16 @@ router.post('/result', async (req: Request, res: Response) => {
     expectedRPID: rpID,
     requireUserVerification: false,
   };
-  const verification = await verifyRegistrationResponse(opts);
+  let verification;
+  try {
+    verification = await verifyRegistrationResponse(opts);
+  } catch (error) {
+    res.json({
+      status: 'failed',
+      errorMessage: (error as Error).message
+    });
+    return
+  }
   const { verified, registrationInfo } = verification;
   if (!verified || !registrationInfo) {
     res.json({

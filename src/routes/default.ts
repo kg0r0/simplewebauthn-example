@@ -3,7 +3,7 @@ import database from './db';
 
 const router = express.Router();
 
-router.get('/isLoggedIn', (req: Request, res: Response) => {
+router.get('/userinfo', (req: Request, res: Response) => {
   if (!req.session.isLoggedIn || !req.session.username) {
     return res.json({
       status: 'failed',
@@ -16,6 +16,21 @@ router.get('/isLoggedIn', (req: Request, res: Response) => {
     errorMessage: '',
     username: user.username
   })
+});
+
+router.get('/logout', (req: Request, res: Response) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.json({
+        status: 'failed',
+        errorMessage: err.message,
+      });
+    }
+  });
+  res.json({
+    status: 'ok',
+    errorMessage: ''
+  });
 });
 
 export default router;

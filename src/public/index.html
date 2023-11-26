@@ -1,19 +1,22 @@
 <!DOCTYPE html>
-<script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
+<head>
+  <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
+</head>
 
-<body onload="isLoggedIn()">
+<body onload="getUserInfo()">
   <h1>SimpleWebAuthn Example</h1>
   <label for="username">Username:</label><br>
   <input type="text" id="username"><br>
   <button type="submit" id="register" onclick="register()">Register</button>
   <button type="submit" id="authenticate" onclick="authenticate()">Authenticate</button>
+  <button type="submit" id="logout" onclick="logout()">Logout</button>
   <p id="success"></p>
   <p id="error"></p>
   <p id="loginname"></p>
 </body>
 <script>
-  async function isLoggedIn() {
-    const resp = await fetch('/isLoggedIn');
+  async function getUserInfo() {
+    const resp = await fetch('/userinfo');
     const json = await resp.json();
     if (json.status === 'ok') {
       document.getElementById('loginname').innerText = 'Logged in as: ' + json.username;
@@ -101,9 +104,18 @@
 
     if (verificationJSON && verificationJSON.status === 'ok') {
       elemSuccess.innerText = 'Successfully authenticated!';
-      await isLoggedIn();
+      await getUserInfo();
     } else {
       elemError.innerText = 'Error: ' + verificationJSON.errorMessage;
+    }
+  }
+
+  async function logout() {
+    const resp = await fetch('/logout');
+    const json = await resp.json();
+    if (json.status === 'ok') {
+      document.getElementById('success').innerText = '';
+      document.getElementById('loginname').innerText = '';
     }
   }
 </script>
