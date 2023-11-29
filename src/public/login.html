@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<head>
+  <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
+  <script>
+    (
+      async () => {
+        const { startAuthentication } = SimpleWebAuthnBrowser;
+        const resp = await fetch('/assertion/options', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        let asseResp;
+        try {
+          asseResp = await startAuthentication(await resp.json(), true);
+        } catch (error) {
+          elemError.innerText = error;
+        }
+        const verificationResp = await fetch('/assertion/result', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(asseResp),
+        });
+        const verificationJSON = await verificationResp.json();
+
+        if (verificationJSON && verificationJSON.status === 'ok') {
+          document.getElementById('success').innerText = 'Successfully authenticated!';
+          document.getElementById('loginname').innerText = 'Logged in as: ' + verificationJSON.username;
+          await getUserInfo();
+        } else {
+          const elemError = document.getElementById('error');
+          elemError.innerText = 'Error: ' + verificationJSON.errorMessage;
+        }
+      }
+    )();
+
+    //fetch('/assertion/options', {
+    //  method: 'POST',
+    //  headers: {
+    //    'Content-Type': 'application/json'
+    //  }
+    //})
+    //  .then(resp => resp.json())
+    //  .then(opts => {
+    //    console.log(opts);
+    //    startAuthentication(opts, true)
+    //      .then(async asseResp => {
+    //        console.log(asseResp);
+    //        const verificationResp = await fetch('/assertion/result', {
+    //          method: 'POST',
+    //          headers: {
+    //            'Content-Type': 'application/json',
+    //          },
+    //          body: JSON.stringify(asseResp),
+    //        });
+
+    //        const verificationJSON = await verificationResp.json();
+    //        if (verificationJSON && verificationJSON.status === 'ok') {
+    //          document.getElementById('success').innerText = 'Successfully authenticated!';
+    //          document.getElementById('loginname').innerText = 'Logged in as: ' + verificationJSON.username;
+    //        } else {
+    //          const elemError = document.getElementById('error');
+    //          elemError.innerText = 'Error: ' + verificationJSON.errorMessage;
+    //        }
+    //      })
+    //      .catch(err => {
+    //        console.error('(Autofill)', err);
+    //      });
+    //  });
+  </script>
+</head>
+
+<body">
+  <h1>SimpleWebAuthn Example</h1>
+  <label for="username">Username:</label><br>
+  <input name="username" id="loginform.username" autocomplete="username webauthn"><br>
+  <p id="success"></p>
+  <p id="error"></p>
+  <p id="loginname"></p>
+  </body>
+
+  </html>

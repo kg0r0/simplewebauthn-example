@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <head>
   <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
 </head>
@@ -6,7 +7,7 @@
 <body onload="getUserInfo()">
   <h1>SimpleWebAuthn Example</h1>
   <label for="username">Username:</label><br>
-  <input type="text" id="username"><br>
+  <input name="username" id="loginform.username" autocomplete="username webauthn"><br>
   <button type="submit" id="register" onclick="register()">Register</button>
   <button type="submit" id="authenticate" onclick="authenticate()">Authenticate</button>
   <button type="submit" id="logout" onclick="logout()">Logout</button>
@@ -29,7 +30,7 @@
     const elemBegin = document.getElementById('register');
     const elemSuccess = document.getElementById('success');
     const elemError = document.getElementById('error');
-    const username = document.getElementById('username');;
+    const username = document.getElementById('loginform.username');;
     elemSuccess.innerHTML = '';
     elemError.innerHTML = '';
     const resp = await fetch('/attestation/options', {
@@ -44,7 +45,10 @@
     });
     let attResp;
     try {
-      attResp = await startRegistration(await resp.json());
+      const opts = await resp.json();
+      attResp = await startRegistration(opts);
+      console.log(opts);
+      console.log(attResp);
     } catch (error) {
       if (error.name === 'InvalidStateError') {
         elemError.innerText = 'Error: Authenticator was probably already registered by user';
@@ -74,7 +78,7 @@
     const elemBegin = document.getElementById('authenticate');
     const elemSuccess = document.getElementById('success');
     const elemError = document.getElementById('error');
-    const username = document.getElementById('username');;
+    const username = document.getElementById('loginform.username');;
     elemSuccess.innerHTML = '';
     elemError.innerHTML = '';
     const resp = await fetch('/assertion/options', {
@@ -89,7 +93,7 @@
     });
     let asseResp;
     try {
-      asseResp = await startAuthentication(await resp.json());
+      asseResp = await startAuthentication(await resp.json(), true);
     } catch (error) {
       elemError.innerText = error;
     }

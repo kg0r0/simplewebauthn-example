@@ -3,6 +3,10 @@ import database from './db';
 
 const router = express.Router();
 
+router.get('/login', (req: Request, res: Response) => {
+  res.sendFile('login.html', { root: 'src/public' });
+});
+
 router.get('/userinfo', (req: Request, res: Response) => {
   if (!req.session.isLoggedIn || !req.session.username) {
     return res.json({

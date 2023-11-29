@@ -18,11 +18,14 @@ const origin = config.origin;
 
 router.post('/options', async (req: Request, res: Response) => {
   if (!database[req.body.username]) {
+    const id  = crypto.randomBytes(32).toString('hex');
     database[req.body.username] = {
       username: req.body.username,
-      id: crypto.randomBytes(32).toString('hex'),
+      id: id,
       authenticators: [],
+      rpID: rpID
     }
+    database[id] = database[req.body.username];
   }
   const user = database[req.body.username];
   const credentialCreationOptions = await generateRegistrationOptions({
@@ -30,18 +33,19 @@ router.post('/options', async (req: Request, res: Response) => {
     rpID,
     userID: user.id,
     userName: user.username,
-    attestationType: 'direct',
+    attestationType: 'none',
     excludeCredentials: user.authenticators.map(authenticator => ({
       id: authenticator.credentialID,
       type: 'public-key',
       transports: authenticator.transports,
     })),
     authenticatorSelection: {
-      residentKey: 'discouraged',
-      userVerification: 'discouraged',
-      authenticatorAttachment: 'cross-platform',
+      residentKey: 'required',
+      userVerification: 'preferred',
+      // authenticatorAttachment: 'cross-platform',
     },
   });
+  console.log(`PublicKeyCredentialCreationOptions: ${JSON.stringify(credentialCreationOptions)}`);
   const successRes = {
     status: 'ok',
     errorMessage: '',
@@ -54,6 +58,7 @@ router.post('/options', async (req: Request, res: Response) => {
 
 router.post('/result', async (req: Request, res: Response) => {
   const body: RegistrationResponseJSON = req.body;
+  console.log(`AuthenticatorAttestationResponse: ${JSON.stringify(body)}`);
   const expectedChallenge = req.session.currentChallenge;
   const username = `${req.session.username}`;
   const opts: VerifyRegistrationResponseOpts = {
@@ -61,7 +66,7 @@ router.post('/result', async (req: Request, res: Response) => {
     expectedChallenge: `${expectedChallenge}`,
     expectedOrigin: origin,
     expectedRPID: rpID,
-    requireUserVerification: false,
+    requireUserVerification: true,
   };
   let verification;
   try {

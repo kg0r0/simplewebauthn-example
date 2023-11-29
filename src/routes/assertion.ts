@@ -21,10 +21,21 @@ const origin = config.origin;
 router.post('/options', async (req: Request, res: Response) => {
   const user = database[req.body.username];
   if (!user) {
-    res.json({
-      status: 'failed',
-      errorMessage: `User ${req.body.username} does not exist`,
-    });
+    const opts: GenerateAuthenticationOptionsOpts = {
+      timeout: 60000,
+      allowCredentials: [],
+      userVerification: 'preferred',
+      rpID
+    }
+    const credentialGetOptions = await generateAuthenticationOptions(opts);
+    console.log(`PublicKeyCredentialRequestOptions: ${JSON.stringify(credentialGetOptions)}`);
+    const successRes = {
+      status: 'ok',
+      errorMessage: ''
+    };
+    const options = Object.assign(successRes, credentialGetOptions);
+    req.session.currentChallenge = options.challenge;
+    res.json(options);
     return;
   }
   const opts: GenerateAuthenticationOptionsOpts = {
@@ -34,10 +45,11 @@ router.post('/options', async (req: Request, res: Response) => {
       type: 'public-key',
       transports: authenticator.transports,
     })),
-    userVerification: 'discouraged',
+    userVerification: 'preferred',
     rpID
   }
   const credentialGetOptions = await generateAuthenticationOptions(opts);
+  console.log(`PublicKeyCredentialRequestOptions: ${JSON.stringify(credentialGetOptions)}`);
   const successRes = {
     status: 'ok',
     errorMessage: '',
@@ -50,8 +62,9 @@ router.post('/options', async (req: Request, res: Response) => {
 
 router.post('/result', async (req: Request, res: Response) => {
   const body: AuthenticationResponseJSON = req.body;
+  console.log(`AuthenticatorAssertionResponse: ${JSON.stringify(body)}`);
   const expectedChallenge = req.session.currentChallenge;
-  const username = `${req.session.username}`;
+  const username = req.session.username || database[req.body.response.userHandle].username;
   const user = database[username];
 
   let dbAuthenticator;
@@ -78,7 +91,7 @@ router.post('/result', async (req: Request, res: Response) => {
       expectedOrigin: origin,
       expectedRPID: rpID,
       authenticator: dbAuthenticator,
-      requireUserVerification: false
+      requireUserVerification: true
     };
     verification = await verifyAuthenticationResponse(opts);
   } catch (error) {
@@ -100,6 +113,7 @@ router.post('/result', async (req: Request, res: Response) => {
   const result = {
     status: 'ok',
     errorMessage: '',
+    username: user.username
   }
   res.json(result)
 });
