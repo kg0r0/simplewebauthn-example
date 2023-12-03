@@ -38,40 +38,6 @@
         }
       }
     )();
-
-    //fetch('/assertion/options', {
-    //  method: 'POST',
-    //  headers: {
-    //    'Content-Type': 'application/json'
-    //  }
-    //})
-    //  .then(resp => resp.json())
-    //  .then(opts => {
-    //    console.log(opts);
-    //    startAuthentication(opts, true)
-    //      .then(async asseResp => {
-    //        console.log(asseResp);
-    //        const verificationResp = await fetch('/assertion/result', {
-    //          method: 'POST',
-    //          headers: {
-    //            'Content-Type': 'application/json',
-    //          },
-    //          body: JSON.stringify(asseResp),
-    //        });
-
-    //        const verificationJSON = await verificationResp.json();
-    //        if (verificationJSON && verificationJSON.status === 'ok') {
-    //          document.getElementById('success').innerText = 'Successfully authenticated!';
-    //          document.getElementById('loginname').innerText = 'Logged in as: ' + verificationJSON.username;
-    //        } else {
-    //          const elemError = document.getElementById('error');
-    //          elemError.innerText = 'Error: ' + verificationJSON.errorMessage;
-    //        }
-    //      })
-    //      .catch(err => {
-    //        console.error('(Autofill)', err);
-    //      });
-    //  });
   </script>
 </head>
 
